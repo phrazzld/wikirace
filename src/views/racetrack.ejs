@@ -1,0 +1,16 @@
+<%- include('header') %>
+  <h2>Get to <%= finish %>!</h2>
+  <div id='track'>
+    <%- wiki %>
+  </div>
+
+  <script type='text/javascript'>
+    var track = document.getElementById('track')
+    var paths = track.getElementsByTagName('a')
+    for (var i = 0; i < paths.length; i++) {
+      var content = paths[i].innerHTML
+      paths[i].href = "/fetch-wiki/<%= start %>/<%= finish %>/" + content
+    }
+  </script>
+
+<%- include('footer') %>

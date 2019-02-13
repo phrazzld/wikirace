@@ -5,6 +5,7 @@ const config = require('@root/config')
 const log = config.loggers.dev()
 const passport = require('passport')
 const helpers = require('@root/helpers')
+const request = require('request')
 const User = require('@models/user').model
 const Run = require('@models/run').model
 
@@ -74,10 +75,47 @@ router.get('/logout', (req, res) => {
 
 router.get('/profile', (req, res) => {
   log.info('GET /profile')
-  res.render('/profile', {
+  res.render('profile', {
     title: 'Profile',
     email: helpers.getEmail(req),
     isLoggedIn: helpers.isLoggedIn(req)
+  })
+})
+
+router.get('/race', (req, res) => {
+  log.info('GET /race')
+  res.render('race', {
+    title: 'Race',
+    isLoggedIn: helpers.isLoggedIn(req)
+  })
+})
+
+router.post('/race', (req, res) => {
+  log.info('POST /race')
+  const { body: { start, finish } } = req
+  request(`https://en.wikipedia.org/w/index.php?title=${start}&action=render`, function (err, response, body) {
+    res.render('racetrack', {
+      title: 'Race - In Progress',
+      isLoggedIn: helpers.isLoggedIn(req),
+      start: start,
+      finish: finish,
+      wiki: body
+    })
+  })
+})
+
+router.get('/fetch-wiki/:start/:finish/:next', (req, res) => {
+  log.info('GET /fetch-wiki')
+  log.info(req.params)
+  const { params: { start, finish, next } } = req
+  request(`https://en.wikipedia.org/w/index.php?title=${next}&action=render`, function (err, response, body) {
+    res.render('racetrack', {
+      title: 'Race - In Progress',
+      isLoggedIn: helpers.isLoggedIn(req),
+      start: start,
+      finish: finish,
+      wiki: body
+    })
   })
 })
 

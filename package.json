@@ -24,7 +24,8 @@
     "mongoose": "^5.4.11",
     "nodemon": "^1.18.10",
     "passport": "^0.4.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "request": "^2.88.0"
   },
   "_moduleAliases": {
     "@root": "src",

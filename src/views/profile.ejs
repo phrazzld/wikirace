@@ -1,3 +1,6 @@
 <%- include('header') %>
   <h2><%= email %></h2>
+  <% runs.forEach(function(run) { %>
+  <li><%= run.start %> to <%= run.end %></li>
+  <% }) %>
 <%- include('footer') %>

@@ -13,6 +13,7 @@ passport.use(new LocalStrategy({
   try {
     const user = await User.findOne({ email }).exec()
     if (!user) {
+      return done(null, false, { message: 'Invalid username or password' })
     }
     const validPassword = await user.validatePassword(password)
     if (!validPassword) {

@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npm run clean && babel -d ./build ./src -s",
     "start": "npm run build && nodemon ./src/index.js | bunyan",
-    "clean": "rm -rf ./build && mkdir build"
+    "clean": "rm -rf ./build && mkdir build",
+    "heroku-postbuild": "npm install && npm run build"
   },
   "author": "Phaedrus Raznikov",
   "license": "ISC",
@@ -26,7 +27,6 @@
     "nodemon": "^1.18.10",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "querystring": "^0.2.0",
     "request": "^2.88.0"
   },
   "_moduleAliases": {

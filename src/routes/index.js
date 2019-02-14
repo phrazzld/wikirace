@@ -4,7 +4,6 @@ const router = require('express').Router()
 const config = require('@root/config')
 const log = config.loggers.dev()
 const passport = require('passport')
-const querystring = require('querystring')
 const cheerio = require('cheerio')
 const helpers = require('@root/helpers')
 const request = require('request')
@@ -77,11 +76,20 @@ router.get('/logout', (req, res) => {
 
 router.get('/profile', (req, res) => {
   log.info('GET /profile')
-  res.render('profile', {
-    title: 'Profile',
-    email: helpers.getEmail(req),
-    isLoggedIn: helpers.isLoggedIn(req)
-  })
+  Run.find({ "user._id": req.user._id })
+    .then((runs) => {
+      log.info(runs)
+      res.render('profile', {
+        title: 'Profile',
+        email: helpers.getEmail(req),
+        isLoggedIn: helpers.isLoggedIn(req),
+        runs: runs
+      })
+    })
+    .catch((err) => {
+      log.fatal(err)
+      res.status(500).send(err)
+    })
 })
 
 router.get('/race', (req, res) => {
@@ -108,21 +116,37 @@ router.get('/race', (req, res) => {
 router.get('/fetch-wiki/:start/:finish/:next', (req, res) => {
   log.info('GET /fetch-wiki')
   const { params: { start, finish, next } } = req
-  log.info(`start: ${start}\nfinish: ${finish}\nnext: ${next}`)
   if (next === finish) {
     log.info('Race complete!')
-  }
-  let nextUrl = `https://en.wikipedia.org/w/index.php?title=${next}&action=render`
-  request(nextUrl, function (err, response, body) {
-    res.render('racetrack', {
-      title: 'Race - In Progress',
-      isLoggedIn: helpers.isLoggedIn(req),
+    Run.create({
       start: start,
-      finish: finish,
-      wiki: body,
-      isFinishLine: false
+      end: finish,
+      path: [],
+      startTime: new Date(),
+      finishTime: new Date(),
+      user: req.user
     })
-  })
+      .then((run) => {
+        log.info(run)
+        res.redirect('/profile')
+      })
+      .catch((err) => {
+        log.fatal(err)
+        res.status(500).send(err)
+      })
+  } else {
+    let nextUrl = `https://en.wikipedia.org/w/index.php?title=${next}&action=render`
+    request(nextUrl, function (err, response, body) {
+      res.render('racetrack', {
+        title: 'Race - In Progress',
+        isLoggedIn: helpers.isLoggedIn(req),
+        start: start,
+        finish: finish,
+        wiki: body,
+        isFinishLine: false
+      })
+    })
+  }
 })
 
 module.exports = router

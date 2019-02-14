@@ -118,22 +118,27 @@ router.get('/fetch-wiki/:start/:finish/:next', (req, res) => {
   const { params: { start, finish, next } } = req
   if (next === finish) {
     log.info('Race complete!')
-    Run.create({
-      start: start,
-      end: finish,
-      path: [],
-      startTime: new Date(),
-      finishTime: new Date(),
-      user: req.user
-    })
-      .then((run) => {
-        log.info(run)
-        res.redirect('/profile')
+    if (helpers.isLoggedIn(req)) {
+      Run.create({
+        start: start,
+        end: finish,
+        path: [],
+        startTime: new Date(),
+        finishTime: new Date(),
+        user: req.user
       })
-      .catch((err) => {
-        log.fatal(err)
-        res.status(500).send(err)
-      })
+        .then((run) => {
+          log.info(run)
+          res.redirect('/profile')
+        })
+        .catch((err) => {
+          log.fatal(err)
+          res.status(500).send(err)
+        })
+    } else {
+      log.info('Log in to save results')
+      res.redirect('/login')
+    }
   } else {
     let nextUrl = `https://en.wikipedia.org/w/index.php?title=${next}&action=render`
     request(nextUrl, function (err, response, body) {

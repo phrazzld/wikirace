@@ -4,6 +4,8 @@ const router = require('express').Router()
 const config = require('@root/config')
 const log = config.loggers.dev()
 const passport = require('passport')
+const querystring = require('querystring')
+const cheerio = require('cheerio')
 const helpers = require('@root/helpers')
 const request = require('request')
 const User = require('@models/user').model
@@ -84,37 +86,41 @@ router.get('/profile', (req, res) => {
 
 router.get('/race', (req, res) => {
   log.info('GET /race')
-  res.render('race', {
-    title: 'Race',
-    isLoggedIn: helpers.isLoggedIn(req)
-  })
-})
-
-router.post('/race', (req, res) => {
-  log.info('POST /race')
-  const { body: { start, finish } } = req
-  request(`https://en.wikipedia.org/w/index.php?title=${start}&action=render`, function (err, response, body) {
-    res.render('racetrack', {
-      title: 'Race - In Progress',
-      isLoggedIn: helpers.isLoggedIn(req),
-      start: start,
-      finish: finish,
-      wiki: body
+  let randomUrl = 'https://en.wikipedia.org/wiki/Special:Random'
+  request(randomUrl, function (finishErr, finishResponse, finishBody) {
+    let $ = cheerio.load(finishResponse.body)
+    let finish = helpers.encodeWikiTitle($('#firstHeading').text())
+    request(randomUrl, function (startErr, startResponse, startBody) {
+      $ = cheerio.load(startResponse.body)
+      let start = helpers.encodeWikiTitle($('#firstHeading').text())
+      res.render('racetrack', {
+        title: 'Finish Line',
+        isLoggedIn: helpers.isLoggedIn(req),
+        start: start,
+        finish: finish,
+        wiki: finishBody,
+        isFinishLine: true
+      })
     })
   })
 })
 
 router.get('/fetch-wiki/:start/:finish/:next', (req, res) => {
   log.info('GET /fetch-wiki')
-  log.info(req.params)
   const { params: { start, finish, next } } = req
-  request(`https://en.wikipedia.org/w/index.php?title=${next}&action=render`, function (err, response, body) {
+  log.info(`start: ${start}\nfinish: ${finish}\nnext: ${next}`)
+  if (next === finish) {
+    log.info('Race complete!')
+  }
+  let nextUrl = `https://en.wikipedia.org/w/index.php?title=${next}&action=render`
+  request(nextUrl, function (err, response, body) {
     res.render('racetrack', {
       title: 'Race - In Progress',
       isLoggedIn: helpers.isLoggedIn(req),
       start: start,
       finish: finish,
-      wiki: body
+      wiki: body,
+      isFinishLine: false
     })
   })
 })

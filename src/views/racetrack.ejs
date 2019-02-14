@@ -1,16 +1,33 @@
 <%- include('header') %>
-  <h2>Get to <%= finish %>!</h2>
+<% if (isFinishLine) { %>
+  <div id='finish-line'>
+    <h2>Check out the Finish Line</h2>
+    <h3>When you're ready, <a id="start-race" href="<%= start %>">start</a></h3>
+  </div>
+<% } else { %>
+  <h2>Race to <%= finish %></h2>
+<% } %>
   <div id='track'>
     <%- wiki %>
   </div>
 
   <script type='text/javascript'>
-    var track = document.getElementById('track')
-    var paths = track.getElementsByTagName('a')
-    for (var i = 0; i < paths.length; i++) {
-      var content = paths[i].innerHTML
-      paths[i].href = "/fetch-wiki/<%= start %>/<%= finish %>/" + content
+  var startRace = document.getElementById('start-race')
+  var freshStart = encodeURIComponent("<%= start %>".split(' ').join('_'))
+  var freshFinish = encodeURIComponent("<%= finish %>".split(' ').join('_'))
+  if (startRace != null) {
+    startRace.href = '/fetch-wiki/' + freshStart + '/' + freshFinish + '/' + freshStart
+  }
+  var track = document.getElementById('track')
+  var paths = track.getElementsByTagName('a')
+  for (var i = 0; i < paths.length; i++) {
+    if (paths[i].title.includes('(page does not exist)')) {
+      paths[i].removeAttribute('href')
+    } else {
+      var nextPage = encodeURIComponent(paths[i].title.split(' ').join('_'))
+      paths[i].href = "/fetch-wiki/" + freshStart + "/" + freshFinish + "/" + nextPage
     }
+  }
   </script>
 
 <%- include('footer') %>

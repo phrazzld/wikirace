@@ -1,8 +1,8 @@
 <%- include('header') %>
   <h2>New Race</h2>
-  <form action='/race' method='POST'>
-    Start Article: <input type='text' name='start'>
-    Finish Line: <input type='text' name='finish'>
+  <form id='race-form' action='/race' method='POST'>
+    Start Article: <input type='text' id='start-article' name='start'>
+    Finish Line: <input type='text' id='finish-article' name='finish'>
     <input type='submit' value='Start'>
   </form>
 <%- include('footer') %>

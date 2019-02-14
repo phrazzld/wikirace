@@ -15,6 +15,7 @@
     "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
+    "cheerio": "^1.0.0-rc.2",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
     "ejs": "^2.6.1",
@@ -25,6 +26,7 @@
     "nodemon": "^1.18.10",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "querystring": "^0.2.0",
     "request": "^2.88.0"
   },
   "_moduleAliases": {

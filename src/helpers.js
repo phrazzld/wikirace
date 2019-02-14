@@ -6,7 +6,12 @@ const getEmail = req => {
   return isLoggedIn(req) ? req.user.email : null
 }
 
+const encodeWikiTitle = title => {
+  return encodeURIComponent(title.split(' ').join('_'))
+}
+
 module.exports = {
   isLoggedIn,
-  getEmail
+  getEmail,
+  encodeWikiTitle
 }
